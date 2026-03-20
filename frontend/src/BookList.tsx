@@ -5,16 +5,17 @@ import { type Book } from "./types/Book";
 function BookList() {
   // State variables for books and pagination
   const [books, setBooks] = useState<Book[]>([]);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(5);
   const [pageNum, setPageNum] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [sortBy, setSortBy] = useState<string>(""); // Track whether sorting is active
 
-  // Fetch books from the API whenever page size or page number changes
+  // Fetch books from the API whenever page size, page number, or sort changes
   useEffect(() => {
     const fetchBooks = async () => {
       const response = await fetch(
-        `http://localhost:5078/Book/AllBooks?pageSize=${pageSize}&pageNum=${pageNum}`,
+        `http://localhost:5078/Book/AllBooks?pageSize=${pageSize}&pageNum=${pageNum}${sortBy ? `&sortBy=${sortBy}` : ""}`,
       );
       const data = await response.json();
       setBooks(data.books);
@@ -23,11 +24,21 @@ function BookList() {
     };
 
     fetchBooks();
-  }, [pageSize, pageNum, totalItems]);
+  }, [pageSize, pageNum, totalItems, sortBy]);
 
   return (
     <div className="container mt-4">
       <h1 className="text-center mb-4 text-dark">Book List</h1>
+
+      {/* Button to sort books by title */}
+      <div className="d-flex justify-content-center mb-3">
+        <button
+          className={`btn ${sortBy === "title" ? "btn-primary" : "btn-outline-primary"}`}
+          onClick={() => setSortBy(sortBy === "title" ? "" : "title")}
+        >
+          {sortBy === "title" ? "Sorting by Title" : "Sort by Title"}
+        </button>
+      </div>
 
       {/* Display books in a responsive grid of cards */}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">

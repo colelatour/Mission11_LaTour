@@ -14,12 +14,21 @@ public class BookController : ControllerBase
     // Inject the database context so we can access book data
     public BookController(BookDbContext temp) => _bookContext = temp;
 
-    // GET endpoint that returns a paginated list of books
+    // GET endpoint that returns a paginated list of books, with optional sorting
     [HttpGet("AllBooks")]
-    public IActionResult GetBooks(int pageSize = 10, int pageNum = 1)
+    public IActionResult GetBooks(int pageSize = 5, int pageNum = 1, string? sortBy = null)
     {
+        // Start with all books
+        var query = _bookContext.Books.AsQueryable();
+
+        // Sort by title if requested
+        if (sortBy == "title")
+        {
+            query = query.OrderBy(b => b.Title);
+        }
+
         // Skip books from previous pages and take only the amount for the current page
-        var something = _bookContext.Books
+        var something = query
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
             .ToList();
