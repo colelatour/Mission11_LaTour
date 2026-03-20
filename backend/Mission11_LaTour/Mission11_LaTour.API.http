@@ -1,0 +1,6 @@
+@Mission11_LaTour.API_HostAddress = http://localhost:5078
+
+GET {{Mission11_LaTour.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
