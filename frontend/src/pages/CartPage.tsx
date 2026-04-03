@@ -1,23 +1,16 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { useCart } from "../context/CartContext";
-import type { CartItem } from "../types/CartItem";
+import { useCart } from '../context/CartContext';
+import type { CartItem } from '../types/CartItem';
 
 function CartPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { cart, removeFromCart, clearCart } = useCart();
 
-  // Calculate the grand total from all items
   const total = cart.reduce(
     (sum, item) => sum + item.unitPrice * item.quantity,
-    0,
+    0
   );
 
-  // Retrieve the page the user was on before adding to cart
-  const returnPage = (location.state as { fromPage?: number })?.fromPage ?? 1;
-
   return (
-    <div className="container py-5" style={{ maxWidth: "800px" }}>
+    <div className="container py-5" style={{ maxWidth: '800px' }}>
       <h2 className="mb-4">Your Cart</h2>
 
       {cart.length === 0 ? (
@@ -26,7 +19,6 @@ function CartPage() {
         </div>
       ) : (
         <>
-          {/* Cart items table with quantity, price, and subtotal columns */}
           <table className="table table-hover align-middle">
             <thead className="table-light">
               <tr>
@@ -73,22 +65,9 @@ function CartPage() {
             >
               Clear Cart
             </button>
-            <button className="btn btn-primary">Checkout</button>
           </div>
         </>
       )}
-
-      {/* Navigate back to the book list on the same page the user left */}
-      <div className="mt-4">
-        <button
-          className="btn btn-outline-dark"
-          onClick={() =>
-            navigate("/books", { state: { fromPage: returnPage } })
-          }
-        >
-          Continue Shopping
-        </button>
-      </div>
     </div>
   );
 }

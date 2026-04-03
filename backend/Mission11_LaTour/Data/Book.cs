@@ -7,7 +7,8 @@ public class Book
 {
     [Key]
     public int BookID { get; set; }
-    
+
+    [Required]
     public string Title { get; set; } = string.Empty;
 
     public string Author { get; set; } = string.Empty;
@@ -19,8 +20,8 @@ public class Book
     public string Classification { get; set; } = string.Empty;
 
     public string Category { get; set; } = string.Empty;
-    
+
     public int PageCount  { get; set; }
-    
-    public double Price { get; set; }
+
+    public decimal Price { get; set; }
 }

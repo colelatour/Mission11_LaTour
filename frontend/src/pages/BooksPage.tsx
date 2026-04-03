@@ -1,20 +1,12 @@
-import { useState } from "react";
-import BookList from "../components/BookList";
-import CategoryFilter from "../components/CategoryFilter";
-import Welcome from "../components/Welcome";
-import CartSummary from "../components/CartSummary";
+import { useState } from 'react';
+import BookList from '../components/BookList';
+import CategoryFilter from '../components/CategoryFilter';
 
-function BookPage() {
+function BooksPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   return (
     <div className="container mt-4">
-      {/* Floating cart summary in top-right corner */}
-      <CartSummary />
-      <div className="row">
-        <Welcome />
-      </div>
-      {/* Bootstrap grid: sidebar filter (3 cols) + book list (9 cols) */}
       <div className="row">
         <div className="col-md-3">
           <CategoryFilter
@@ -30,4 +22,4 @@ function BookPage() {
   );
 }
 
-export default BookPage;
+export default BooksPage;

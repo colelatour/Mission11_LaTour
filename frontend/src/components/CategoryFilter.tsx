@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import { fetchCategories } from '../api/BooksAPI';
 
-// Sidebar filter that fetches categories from the API and lets the user toggle them
 function CategoryFilter({
   selectedCategories,
   setSelectedCategories,
@@ -11,20 +11,16 @@ function CategoryFilter({
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5078/Book/GetBookCategories",
-        );
-        const data = await response.json();
-        console.log("Fetched categories:", data);
+        const data = await fetchCategories();
         setCategories(data);
       } catch (error) {
-        console.error("Error fetching categories", error);
+        console.error('Error fetching categories', error);
       }
     };
 
-    fetchCategories();
+    loadCategories();
   }, []);
 
   function handleCheckboxChange({ target }: { target: HTMLInputElement }) {

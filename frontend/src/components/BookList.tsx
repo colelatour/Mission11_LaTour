@@ -1,60 +1,44 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { type Book } from "../types/Book";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import type { Book } from '../types/Book';
+import { fetchBooks } from '../api/BooksAPI';
+import { useCart } from '../context/CartContext';
+import Pagination from './Pagination';
 
 function BookList({ selectedCategories }: { selectedCategories: string[] }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  // Restore the page number the user was on before navigating away
-  const savedPage =
-    (location.state as { fromPage?: number })?.fromPage ?? 1;
-
-  // State variables for books and pagination
+  const { addToCart } = useCart();
   const [books, setBooks] = useState<Book[]>([]);
   const [pageSize, setPageSize] = useState<number>(5);
-  const [pageNum, setPageNum] = useState<number>(savedPage);
-  const [totalItems, setTotalItems] = useState<number>(0);
+  const [pageNum, setPageNum] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Reset to page 1 when filters change
   useEffect(() => {
     setPageNum(1);
   }, [selectedCategories]);
 
-  // Fetch books from the API whenever page size, page number, or sort changes
   useEffect(() => {
-    const fetchBooks = async () => {
-      const categoryParams = selectedCategories
-        .map((cat) => `category=${encodeURIComponent(cat)}`)
-        .join("&");
-      const response = await fetch(
-        `http://localhost:5078/Book/AllBooks?pageSize=${pageSize}&pageNum=${pageNum}${sortBy ? `&sortBy=${sortBy}` : ""}${selectedCategories.length ? `&${categoryParams}` : ""}`,
-      );
-      const data = await response.json();
-      setBooks(data.books);
-      setTotalItems(data.totalNumBooks); // Store the total number of books
-      setTotalPages(Math.ceil(data.totalNumBooks / pageSize)); // Calculate how many pages we need
+    const loadBooks = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchBooks(pageSize, pageNum, selectedCategories);
+        setBooks(data.books);
+        setTotalPages(Math.ceil(data.totalNumBooks / pageSize));
+      } catch (err) {
+        setError('Failed to load books.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchBooks();
-  }, [pageSize, pageNum, sortBy, selectedCategories]);
+    loadBooks();
+  }, [pageSize, pageNum, selectedCategories]);
+
+  if (loading) return <p>Loading books...</p>;
+  if (error) return <p className="text-danger">{error}</p>;
 
   return (
     <div className="container mt-4">
-      {/* Button to sort books by title */}
-      <div className="d-flex justify-content-center mb-3">
-        <button
-          className={`btn ${sortBy === "title" ? "btn-primary" : "btn-outline-primary"}`}
-          onClick={() => setSortBy(sortBy === "title" ? "" : "title")}
-        >
-          {sortBy === "title" ? "Sorting by Title" : "Sort by Title"}
-        </button>
-      </div>
-
-      {/* Display books in a responsive grid of cards */}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
         {books.map((b) => (
           <div className="col" key={b.bookID}>
@@ -66,7 +50,6 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
                 <h6 className="card-subtitle mb-3 text-muted">
                   By: {b.author}
                 </h6>
-                {/* List out each book's details */}
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item">
                     <strong>Publisher:</strong> {b.publisher}
@@ -87,14 +70,16 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
                     <strong>Price:</strong> ${b.price.toFixed(2)}
                   </li>
                 </ul>
-
               </div>
               <div className="card-footer bg-white border-top-0 text-center">
                 <button
                   className="btn btn-success w-100"
                   onClick={() =>
-                    navigate(`/purchase/${b.title}/${b.bookID}/${b.price}`, {
-                      state: { fromPage: pageNum },
+                    addToCart({
+                      bookID: b.bookID,
+                      title: b.title,
+                      unitPrice: b.price,
+                      quantity: 1,
                     })
                   }
                 >
@@ -106,67 +91,16 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
         ))}
       </div>
 
-      {/* Pagination buttons */}
-      <div className="d-flex justify-content-center align-items-center gap-2 mb-3">
-        <nav>
-          <ul className="pagination mb-0">
-            {/* Previous button - disabled on first page */}
-            <li className={`page-item ${pageNum === 1 ? "disabled" : ""}`}>
-              <button
-                className="page-link"
-                onClick={() => setPageNum(pageNum - 1)}
-                disabled={pageNum === 1}
-              >
-                Previous
-              </button>
-            </li>
-
-            {/* Generate a button for each page number */}
-            {[...Array(totalPages)].map((_, index) => (
-              <li
-                className={`page-item ${pageNum === index + 1 ? "active" : ""}`}
-                key={index + 1}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => setPageNum(index + 1)}
-                >
-                  {index + 1}
-                </button>
-              </li>
-            ))}
-
-            {/* Next button - disabled on last page */}
-            <li
-              className={`page-item ${pageNum >= totalPages ? "disabled" : ""}`}
-            >
-              <button
-                className="page-link"
-                onClick={() => setPageNum(pageNum + 1)}
-                disabled={pageNum >= totalPages}
-              >
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Dropdown to change how many results are shown per page */}
-      <div className="d-flex justify-content-center mb-4">
-        <label className="form-label me-2 mb-0 align-self-center">
-          Results per page:
-        </label>
-        <select
-          className="form-select w-auto"
-          value={pageSize}
-          onChange={(b) => setPageSize(Number(b.target.value))}
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-        </select>
-      </div>
+      <Pagination
+        currentPage={pageNum}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        onPageChange={setPageNum}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPageNum(1);
+        }}
+      />
     </div>
   );
 }
