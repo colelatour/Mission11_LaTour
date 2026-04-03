@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/2376c2b8-6a23-4e42-a26c-57838c825ae9/resourceGroups/appsvc_windows_francecentral/providers/Microsoft.Web/sites/Mission13-LaTour",
+  "appService.deploySubpath": "backend/Mission11_LaTour/publish"
+}
