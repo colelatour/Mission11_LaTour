@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import type { CartItem } from '../types/CartItem';
 
 function CartPage() {
   const { cart, removeFromCart, clearCart } = useCart();
+  const navigate = useNavigate();
 
   const total = cart.reduce(
     (sum, item) => sum + item.unitPrice * item.quantity,
@@ -14,8 +16,16 @@ function CartPage() {
       <h2 className="mb-4">Your Cart</h2>
 
       {cart.length === 0 ? (
-        <div className="alert alert-info text-center" role="alert">
-          Your cart is empty!
+        <div className="text-center">
+          <div className="alert alert-info" role="alert">
+            Your cart is empty!
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate('/books')}
+          >
+            Browse Books
+          </button>
         </div>
       ) : (
         <>
@@ -58,7 +68,13 @@ function CartPage() {
             </tfoot>
           </table>
 
-          <div className="d-flex justify-content-end gap-2 mt-3">
+          <div className="d-flex justify-content-between mt-3">
+            <button
+              className="btn btn-outline-primary"
+              onClick={() => navigate('/books')}
+            >
+              Continue Shopping
+            </button>
             <button
               className="btn btn-outline-secondary btn-sm"
               onClick={() => clearCart()}

@@ -12,6 +12,7 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [addedBookId, setAddedBookId] = useState<number | null>(null);
 
   useEffect(() => {
     setPageNum(1);
@@ -33,6 +34,17 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
 
     loadBooks();
   }, [pageSize, pageNum, selectedCategories]);
+
+  const handleAddToCart = (b: Book) => {
+    addToCart({
+      bookID: b.bookID,
+      title: b.title,
+      unitPrice: b.price,
+      quantity: 1,
+    });
+    setAddedBookId(b.bookID);
+    setTimeout(() => setAddedBookId(null), 1500);
+  };
 
   if (loading) return <p>Loading books...</p>;
   if (error) return <p className="text-danger">{error}</p>;
@@ -73,17 +85,10 @@ function BookList({ selectedCategories }: { selectedCategories: string[] }) {
               </div>
               <div className="card-footer bg-white border-top-0 text-center">
                 <button
-                  className="btn btn-success w-100"
-                  onClick={() =>
-                    addToCart({
-                      bookID: b.bookID,
-                      title: b.title,
-                      unitPrice: b.price,
-                      quantity: 1,
-                    })
-                  }
+                  className={`btn w-100 ${addedBookId === b.bookID ? 'btn-outline-success' : 'btn-success'}`}
+                  onClick={() => handleAddToCart(b)}
                 >
-                  Add to Cart
+                  {addedBookId === b.bookID ? 'Added!' : 'Add to Cart'}
                 </button>
               </div>
             </div>
