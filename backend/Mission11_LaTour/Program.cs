@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("frontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins("http://localhost:3000", "https://victorious-field-09d7e3d1e.7.azurestaticapps.net")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
