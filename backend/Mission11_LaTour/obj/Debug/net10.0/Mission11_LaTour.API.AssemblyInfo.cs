@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Mission11_LaTour.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac8b2cbaa9e831c12a2bf2e9928f2fda940c03e2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aee54b1e09cb4dd9a7527083e40d1501f572ef4d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Mission11_LaTour.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Mission11_LaTour.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
